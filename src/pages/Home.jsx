@@ -1,41 +1,86 @@
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CardMedia,
-  Grid,
-  IconButton,
-  Container,
-} from "@mui/material";
+import { Box, Typography, Container, IconButton } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
+import BookCard from "../components/BookCard";
+import Toast from "../components/Toast";
+import useCollection from "../hooks/useCollection";
 
 // Mock data for demonstration
 const mockBooks = [
   {
-    id: 1,
+    book_id: 1,
     title: "The Great Gatsby",
     author: "F. Scott Fitzgerald",
-    cover: "https://covers.openlibrary.org/b/id/8051016-L.jpg",
+    cover_url: "https://covers.openlibrary.org/b/id/8051016-L.jpg",
     genre: "Fiction",
+    description:
+      "A story of the fabulously wealthy Jay Gatsby and his love for the beautiful Daisy Buchanan.",
+    isbn: "978-0743273565",
   },
   {
-    id: 2,
+    book_id: 2,
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
-    cover: "https://covers.openlibrary.org/b/id/8051017-L.jpg",
+    cover_url: "https://covers.openlibrary.org/b/id/8051017-L.jpg",
     genre: "Fiction",
+    description:
+      "The story of young Scout Finch and her father Atticus in a racially divided Alabama town.",
+    isbn: "978-0446310789",
   },
-  // Add more mock books as needed
+  {
+    book_id: 3,
+    title: "The Lord of the Rings",
+    author: "J.R.R. Tolkien",
+    cover_url: "https://covers.openlibrary.org/b/id/8051018-L.jpg",
+    genre: "Fantasy",
+    description:
+      "An epic high-fantasy novel about the quest to destroy a powerful ring.",
+    isbn: "978-0547928210",
+  },
+  {
+    book_id: 4,
+    title: "1984",
+    author: "George Orwell",
+    cover_url: "https://covers.openlibrary.org/b/id/8051019-L.jpg",
+    genre: "Dystopian",
+    description:
+      "A dystopian novel about totalitarianism and surveillance society.",
+    isbn: "978-0451524935",
+  },
+  {
+    book_id: 5,
+    title: "Pride and Prejudice",
+    author: "Jane Austen",
+    cover_url: "https://covers.openlibrary.org/b/id/8051020-L.jpg",
+    genre: "Romance",
+    description:
+      "A romantic novel of manners about the relationship between Elizabeth Bennet and Mr. Darcy.",
+    isbn: "978-0141439518",
+  },
+  {
+    book_id: 6,
+    title: "The Hobbit",
+    author: "J.R.R. Tolkien",
+    cover_url: "https://covers.openlibrary.org/b/id/8051021-L.jpg",
+    genre: "Fantasy",
+    description:
+      "A fantasy novel about Bilbo Baggins' journey with thirteen dwarves.",
+    isbn: "978-0547928241",
+  },
 ];
 
-const BookCarousel = ({ title, books }) => {
+const BookCarousel = ({
+  title,
+  books,
+  onAddToCollection,
+  onViewDetails,
+  userCollection,
+}) => {
   const [startIndex, setStartIndex] = useState(0);
-  const booksPerPage = 4;
+  const booksPerPage = 12;
 
   const handlePrev = () => {
     setStartIndex((prev) => Math.max(0, prev - 1));
@@ -64,39 +109,22 @@ const BookCarousel = ({ title, books }) => {
         >
           <ChevronLeftIcon />
         </IconButton>
-        <Grid container spacing={2}>
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1">
           {books.slice(startIndex, startIndex + booksPerPage).map((book) => (
-            <Grid item xs={12} sm={6} md={3} key={book.id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  cursor: "pointer",
-                  "&:hover": {
-                    transform: "scale(1.02)",
-                    transition: "transform 0.2s ease-in-out",
-                  },
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={book.cover}
-                  alt={book.title}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {book.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {book.author}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+            <BookCard
+              key={book.book_id}
+              book={book}
+              onAddToCollection={onAddToCollection}
+              onViewDetails={onViewDetails}
+              userStatus={
+                userCollection.find((b) => b.book_id === book.book_id)
+                  ?.status || null
+              }
+              averageRating={4.2}
+              reviewCount={156}
+            />
           ))}
-        </Grid>
+        </div>
         <IconButton
           sx={{
             position: "absolute",
@@ -119,6 +147,7 @@ const Home = () => {
   const [trendingBooks, setTrendingBooks] = useState([]);
   const [recommendedBooks, setRecommendedBooks] = useState([]);
   const [topPicks, setTopPicks] = useState([]);
+  const { collection, addToCollection, toast, hideToast } = useCollection();
 
   useEffect(() => {
     // TODO: Replace with actual API calls
@@ -127,11 +156,47 @@ const Home = () => {
     setTopPicks(mockBooks);
   }, []);
 
+  const handleAddToCollection = (bookId) => {
+    const book = mockBooks.find((b) => b.book_id === bookId);
+    if (book) {
+      addToCollection(book);
+    }
+  };
+
+  const handleViewDetails = (bookId) => {
+    // TODO: Navigate to book details page
+    console.log("View details for book:", bookId);
+  };
+
   return (
     <Container maxWidth="xl">
-      <BookCarousel title="Trending Now" books={trendingBooks} />
-      <BookCarousel title="Recommended for You" books={recommendedBooks} />
-      <BookCarousel title="Top Picks" books={topPicks} />
+      <BookCarousel
+        title="Trending Now"
+        books={trendingBooks}
+        onAddToCollection={handleAddToCollection}
+        onViewDetails={handleViewDetails}
+        userCollection={collection}
+      />
+      <BookCarousel
+        title="Recommended for You"
+        books={recommendedBooks}
+        onAddToCollection={handleAddToCollection}
+        onViewDetails={handleViewDetails}
+        userCollection={collection}
+      />
+      <BookCarousel
+        title="Top Picks"
+        books={topPicks}
+        onAddToCollection={handleAddToCollection}
+        onViewDetails={handleViewDetails}
+        userCollection={collection}
+      />
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+      />
     </Container>
   );
 };
