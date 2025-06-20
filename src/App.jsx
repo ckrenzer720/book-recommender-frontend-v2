@@ -23,6 +23,10 @@ function App() {
       secondary: {
         main: "#dc004e",
       },
+      background: {
+        default: darkMode ? "#121212" : "#f5f5dc",
+        paper: darkMode ? "#1e1e1e" : "#ffffff",
+      },
     },
   });
 

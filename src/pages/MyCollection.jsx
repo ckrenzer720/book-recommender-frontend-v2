@@ -1,8 +1,28 @@
 import { useState } from "react";
 import { Box, Typography, Container, Tabs, Tab, Chip } from "@mui/material";
+import styled from "styled-components";
 import BookCard from "../components/BookCard";
 import Toast from "../components/Toast";
 import useCollection from "../hooks/useCollection";
+
+// Styled Components
+const BookGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
 
 const MyCollection = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -27,7 +47,7 @@ const MyCollection = () => {
   };
 
   const renderBookGrid = (books) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <BookGrid>
       {books.map((book) => (
         <BookCard
           key={book.book_id}
@@ -39,7 +59,7 @@ const MyCollection = () => {
           reviewCount={156}
         />
       ))}
-    </div>
+    </BookGrid>
   );
 
   const allBooks = getBooksByStatus("owned").concat(

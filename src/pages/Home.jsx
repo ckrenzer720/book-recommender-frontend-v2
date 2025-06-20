@@ -4,9 +4,29 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
+import styled from "styled-components";
 import BookCard from "../components/BookCard";
 import Toast from "../components/Toast";
 import useCollection from "../hooks/useCollection";
+
+// Styled Components
+const BookGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(12, 1fr);
+  }
+`;
 
 // Mock data for demonstration
 const mockBooks = [
@@ -73,7 +93,6 @@ const mockBooks = [
 ];
 
 const BookCarousel = ({
-  title,
   books,
   onAddToCollection,
   onViewDetails,
@@ -91,10 +110,9 @@ const BookCarousel = ({
   };
 
   return (
-    <Box sx={{ my: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        {title}
-      </Typography>
+    <Box
+      sx={{ position: "relative", bgcolor: "#e6e1d1", p: 2, borderRadius: 2 }}
+    >
       <Box sx={{ position: "relative" }}>
         <IconButton
           sx={{
@@ -103,13 +121,17 @@ const BookCarousel = ({
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 1,
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+            },
           }}
           onClick={handlePrev}
           disabled={startIndex === 0}
         >
           <ChevronLeftIcon />
         </IconButton>
-        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-1">
+        <BookGrid>
           {books.slice(startIndex, startIndex + booksPerPage).map((book) => (
             <BookCard
               key={book.book_id}
@@ -124,7 +146,7 @@ const BookCarousel = ({
               reviewCount={156}
             />
           ))}
-        </div>
+        </BookGrid>
         <IconButton
           sx={{
             position: "absolute",
@@ -132,6 +154,10 @@ const BookCarousel = ({
             top: "50%",
             transform: "translateY(-50%)",
             zIndex: 1,
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+            "&:hover": {
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+            },
           }}
           onClick={handleNext}
           disabled={startIndex + booksPerPage >= books.length}
@@ -170,22 +196,28 @@ const Home = () => {
 
   return (
     <Container maxWidth="xl">
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Trending Now
+      </Typography>
       <BookCarousel
-        title="Trending Now"
         books={trendingBooks}
         onAddToCollection={handleAddToCollection}
         onViewDetails={handleViewDetails}
         userCollection={collection}
       />
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Recommended for You
+      </Typography>
       <BookCarousel
-        title="Recommended for You"
         books={recommendedBooks}
         onAddToCollection={handleAddToCollection}
         onViewDetails={handleViewDetails}
         userCollection={collection}
       />
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Top Picks
+      </Typography>
       <BookCarousel
-        title="Top Picks"
         books={topPicks}
         onAddToCollection={handleAddToCollection}
         onViewDetails={handleViewDetails}
