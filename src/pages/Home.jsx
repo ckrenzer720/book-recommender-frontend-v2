@@ -95,6 +95,7 @@ const mockBooks = [
 const BookCarousel = ({
   books,
   onAddToCollection,
+  onUpdateStatus,
   onViewDetails,
   userCollection,
 }) => {
@@ -137,6 +138,7 @@ const BookCarousel = ({
               key={book.book_id}
               book={book}
               onAddToCollection={onAddToCollection}
+              onUpdateStatus={onUpdateStatus}
               onViewDetails={onViewDetails}
               userStatus={
                 userCollection.find((b) => b.book_id === book.book_id)
@@ -173,7 +175,8 @@ const Home = () => {
   const [trendingBooks, setTrendingBooks] = useState([]);
   const [recommendedBooks, setRecommendedBooks] = useState([]);
   const [topPicks, setTopPicks] = useState([]);
-  const { collection, addToCollection, toast, hideToast } = useCollection();
+  const { collection, addToCollection, updateBookStatus, toast, hideToast } =
+    useCollection();
 
   useEffect(() => {
     // TODO: Replace with actual API calls
@@ -189,6 +192,10 @@ const Home = () => {
     }
   };
 
+  const handleUpdateStatus = (bookId, newStatus) => {
+    updateBookStatus(bookId, newStatus);
+  };
+
   const handleViewDetails = (bookId) => {
     // TODO: Navigate to book details page
     console.log("View details for book:", bookId);
@@ -202,6 +209,7 @@ const Home = () => {
       <BookCarousel
         books={trendingBooks}
         onAddToCollection={handleAddToCollection}
+        onUpdateStatus={handleUpdateStatus}
         onViewDetails={handleViewDetails}
         userCollection={collection}
       />
@@ -211,6 +219,7 @@ const Home = () => {
       <BookCarousel
         books={recommendedBooks}
         onAddToCollection={handleAddToCollection}
+        onUpdateStatus={handleUpdateStatus}
         onViewDetails={handleViewDetails}
         userCollection={collection}
       />
@@ -220,6 +229,7 @@ const Home = () => {
       <BookCarousel
         books={topPicks}
         onAddToCollection={handleAddToCollection}
+        onUpdateStatus={handleUpdateStatus}
         onViewDetails={handleViewDetails}
         userCollection={collection}
       />

@@ -6,6 +6,9 @@ import {
   Visibility,
   BookmarkBorder,
   Launch,
+  FavoriteBorder,
+  LibraryBooks,
+  CheckCircle,
 } from "@mui/icons-material";
 
 // Styled Components
@@ -41,15 +44,25 @@ const ActionButtonContainer = styled.div`
   padding: 0.75rem;
   padding-top: 0;
   margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
-const ActionButton = styled.button`
-  background-color: #0077c2;
+const ActionButton = styled.button.withConfig({
+  shouldForwardProp: (prop) =>
+    !["isWishlist", "isOwned", "isRead"].includes(prop),
+})`
+  background-color: ${(props) => {
+    if (props.isWishlist) return "#e91e63";
+    if (props.isOwned) return "#4caf50";
+    if (props.isRead) return "#2196f3";
+    return "#0077c2";
+  }};
   color: white;
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
-  width: 100%;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -57,10 +70,21 @@ const ActionButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  width: 100%;
 
   &:hover {
-    background-color: #005fa5;
+    background-color: ${(props) => {
+      if (props.isWishlist) return "#c2185b";
+      if (props.isOwned) return "#388e3c";
+      if (props.isRead) return "#1976d2";
+      return "#005fa5";
+    }};
+    transform: scale(1.02);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -68,22 +92,61 @@ const BookCard = ({
   book,
   onAddToCollection,
   onViewDetails,
+  onUpdateStatus,
   userStatus = null,
 }) => {
   const { book_id, title, cover_url } = book;
 
-  const getActionDetails = (status) => {
-    switch (status) {
-      case "owned":
-        return { text: "Read", icon: <Visibility /> };
-      case "wishlist":
-        return { text: "Locate", icon: <Launch /> };
-      default:
-        return { text: "Preview Only", icon: null };
+  const handleStatusUpdate = (newStatus) => {
+    if (onUpdateStatus) {
+      onUpdateStatus(book_id, newStatus);
+    } else if (onAddToCollection) {
+      onAddToCollection(book_id);
     }
   };
 
-  const { text: buttonText, icon: buttonIcon } = getActionDetails(userStatus);
+  const renderActionButtons = () => {
+    if (userStatus) {
+      // Book is in collection - show status action buttons
+      return (
+        <>
+          <ActionButton
+            onClick={() => handleStatusUpdate("owned")}
+            isOwned={userStatus === "owned"}
+          >
+            <LibraryBooks />
+            Owned
+          </ActionButton>
+          <ActionButton
+            onClick={() => handleStatusUpdate("read")}
+            isRead={userStatus === "read"}
+          >
+            <CheckCircle />
+            Read
+          </ActionButton>
+          <ActionButton
+            onClick={() => handleStatusUpdate("wishlist")}
+            isWishlist={userStatus === "wishlist"}
+          >
+            <FavoriteBorder />
+            Wishlist
+          </ActionButton>
+        </>
+      );
+    } else {
+      // Book is not in collection - show add to collection button
+      return (
+        <ActionButton
+          onClick={() => handleStatusUpdate("wishlist")}
+          isWishlist={true}
+          style={{ width: "100%" }}
+        >
+          <FavoriteBorder />
+          Add to Collection
+        </ActionButton>
+      );
+    }
+  };
 
   return (
     <div>
@@ -98,12 +161,7 @@ const BookCard = ({
           />
         </CoverContainer>
       </CardContainer>
-      <ActionButtonContainer>
-        <ActionButton onClick={() => onAddToCollection(book_id)}>
-          {buttonIcon}
-          {buttonText}
-        </ActionButton>
-      </ActionButtonContainer>
+      <ActionButtonContainer>{renderActionButtons()}</ActionButtonContainer>
     </div>
   );
 };

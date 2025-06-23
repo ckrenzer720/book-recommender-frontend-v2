@@ -26,8 +26,14 @@ const BookGrid = styled.div`
 
 const MyCollection = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const { collection, addToCollection, getBooksByStatus, toast, hideToast } =
-    useCollection();
+  const {
+    collection,
+    addToCollection,
+    updateBookStatus,
+    getBooksByStatus,
+    toast,
+    hideToast,
+  } = useCollection();
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -39,6 +45,10 @@ const MyCollection = () => {
     if (book) {
       addToCollection(book);
     }
+  };
+
+  const handleUpdateStatus = (bookId, newStatus) => {
+    updateBookStatus(bookId, newStatus);
   };
 
   const handleViewDetails = (bookId) => {
@@ -53,6 +63,7 @@ const MyCollection = () => {
           key={book.book_id}
           book={book}
           onAddToCollection={handleAddToCollection}
+          onUpdateStatus={handleUpdateStatus}
           onViewDetails={handleViewDetails}
           userStatus={book.status}
           averageRating={4.2}
