@@ -100,6 +100,14 @@ const useCollection = () => {
       showToast(`${book.title} marked as read`, "success");
     } else if (status === "owned" && book.status === "read") {
       showToast(`${book.title} marked as unread`, "info");
+    } else if (status === "wishlist" && book.status === "owned") {
+      showToast(`${book.title} moved to wishlist`, "info");
+    } else if (book.status === "wishlist" && status === "owned") {
+      showToast(`${book.title} removed from wishlist`, "info");
+    } else if (status === "owned") {
+      showToast(`${book.title} marked as owned`, "success");
+    } else if (status === "wishlist") {
+      showToast(`${book.title} added to wishlist`, "success");
     } else {
       showToast(`${book.title} moved to ${status}`, "success");
     }

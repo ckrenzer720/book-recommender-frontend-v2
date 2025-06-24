@@ -114,17 +114,33 @@ const BookCard = ({
     }
   };
 
+  const handleOwnedToggle = () => {
+    if (onUpdateStatus) {
+      // If currently owned, toggle to wishlist. If wishlist or read, toggle to owned.
+      const newStatus = userStatus === "owned" ? "wishlist" : "owned";
+      onUpdateStatus(book_id, newStatus);
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (onUpdateStatus) {
+      // If currently wishlist, toggle to owned. If owned or read, toggle to wishlist.
+      const newStatus = userStatus === "wishlist" ? "owned" : "wishlist";
+      onUpdateStatus(book_id, newStatus);
+    }
+  };
+
   const renderActionButtons = () => {
     if (userStatus) {
       // Book is in collection - show status action buttons
       return (
         <>
           <ActionButton
-            onClick={() => handleStatusUpdate("owned")}
+            onClick={handleOwnedToggle}
             isOwned={userStatus === "owned"}
           >
-            <LibraryBooks />
-            Owned
+            {userStatus === "owned" ? <BookmarkBorder /> : <LibraryBooks />}
+            {userStatus === "owned" ? "Move to Wishlist" : "Mark as Owned"}
           </ActionButton>
           <ActionButton
             onClick={handleReadToggle}
@@ -134,11 +150,13 @@ const BookCard = ({
             {userStatus === "read" ? "Mark as Unread" : "Mark as Read"}
           </ActionButton>
           <ActionButton
-            onClick={() => handleStatusUpdate("wishlist")}
+            onClick={handleWishlistToggle}
             isWishlist={userStatus === "wishlist"}
           >
-            <FavoriteBorder />
-            Wishlist
+            {userStatus === "wishlist" ? <Favorite /> : <FavoriteBorder />}
+            {userStatus === "wishlist"
+              ? "Remove from Wishlist"
+              : "Add to Wishlist"}
           </ActionButton>
         </>
       );
