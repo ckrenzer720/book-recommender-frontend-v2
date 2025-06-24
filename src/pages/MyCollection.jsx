@@ -26,14 +26,8 @@ const BookGrid = styled.div`
 
 const MyCollection = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const {
-    collection,
-    addToCollection,
-    updateBookStatus,
-    getBooksByStatus,
-    toast,
-    hideToast,
-  } = useCollection();
+  const { collection, addToCollection, updateBookStatus, toast, hideToast } =
+    useCollection();
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -73,10 +67,8 @@ const MyCollection = () => {
     </BookGrid>
   );
 
-  const allBooks = getBooksByStatus("owned").concat(
-    getBooksByStatus("read"),
-    getBooksByStatus("wishlist")
-  );
+  // Preserve original collection order instead of concatenating by status
+  const allBooks = collection;
 
   return (
     <Container maxWidth="xl">
@@ -88,17 +80,23 @@ const MyCollection = () => {
         {/* Collection Stats */}
         <Box sx={{ mb: 3, display: "flex", gap: 2, flexWrap: "wrap" }}>
           <Chip
-            label={`${getBooksByStatus("owned").length} Owned`}
+            label={`${
+              collection.filter((book) => book.status === "owned").length
+            } Owned`}
             color="success"
             variant="outlined"
           />
           <Chip
-            label={`${getBooksByStatus("read").length} Read`}
+            label={`${
+              collection.filter((book) => book.status === "read").length
+            } Read`}
             color="primary"
             variant="outlined"
           />
           <Chip
-            label={`${getBooksByStatus("wishlist").length} Wishlist`}
+            label={`${
+              collection.filter((book) => book.status === "wishlist").length
+            } Wishlist`}
             color="error"
             variant="outlined"
           />
@@ -108,17 +106,34 @@ const MyCollection = () => {
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
           <Tabs value={activeTab} onChange={handleTabChange}>
             <Tab label={`All (${allBooks.length})`} />
-            <Tab label={`Owned (${getBooksByStatus("owned").length})`} />
-            <Tab label={`Read (${getBooksByStatus("read").length})`} />
-            <Tab label={`Wishlist (${getBooksByStatus("wishlist").length})`} />
+            <Tab
+              label={`Owned (${
+                collection.filter((book) => book.status === "owned").length
+              })`}
+            />
+            <Tab
+              label={`Read (${
+                collection.filter((book) => book.status === "read").length
+              })`}
+            />
+            <Tab
+              label={`Wishlist (${
+                collection.filter((book) => book.status === "wishlist").length
+              })`}
+            />
           </Tabs>
         </Box>
 
         {/* Book Grid */}
         {activeTab === 0 && renderBookGrid(allBooks)}
-        {activeTab === 1 && renderBookGrid(getBooksByStatus("owned"))}
-        {activeTab === 2 && renderBookGrid(getBooksByStatus("read"))}
-        {activeTab === 3 && renderBookGrid(getBooksByStatus("wishlist"))}
+        {activeTab === 1 &&
+          renderBookGrid(collection.filter((book) => book.status === "owned"))}
+        {activeTab === 2 &&
+          renderBookGrid(collection.filter((book) => book.status === "read"))}
+        {activeTab === 3 &&
+          renderBookGrid(
+            collection.filter((book) => book.status === "wishlist")
+          )}
 
         {/* Empty State */}
         {collection.length === 0 && (
@@ -134,18 +149,21 @@ const MyCollection = () => {
 
         {(collection.length > 0 &&
           activeTab === 1 &&
-          getBooksByStatus("owned").length === 0) ||
-          (activeTab === 2 && getBooksByStatus("read").length === 0) ||
-          (activeTab === 3 && getBooksByStatus("wishlist").length === 0 && (
-            <Box sx={{ textAlign: "center", py: 8 }}>
-              <Typography variant="h6" color="text.secondary" gutterBottom>
-                No books in this category
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Try adding some books to this category!
-              </Typography>
-            </Box>
-          ))}
+          collection.filter((book) => book.status === "owned").length === 0) ||
+          (activeTab === 2 &&
+            collection.filter((book) => book.status === "read").length === 0) ||
+          (activeTab === 3 &&
+            collection.filter((book) => book.status === "wishlist").length ===
+              0 && (
+              <Box sx={{ textAlign: "center", py: 8 }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No books in this category
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Try adding some books to this category!
+                </Typography>
+              </Box>
+            ))}
       </Box>
       <Toast
         message={toast.message}

@@ -9,6 +9,7 @@ import {
   FavoriteBorder,
   LibraryBooks,
   CheckCircle,
+  VisibilityOff,
 } from "@mui/icons-material";
 
 // Styled Components
@@ -105,6 +106,14 @@ const BookCard = ({
     }
   };
 
+  const handleReadToggle = () => {
+    if (onUpdateStatus) {
+      // If currently read, toggle back to owned. If owned, toggle to read.
+      const newStatus = userStatus === "read" ? "owned" : "read";
+      onUpdateStatus(book_id, newStatus);
+    }
+  };
+
   const renderActionButtons = () => {
     if (userStatus) {
       // Book is in collection - show status action buttons
@@ -118,11 +127,11 @@ const BookCard = ({
             Owned
           </ActionButton>
           <ActionButton
-            onClick={() => handleStatusUpdate("read")}
+            onClick={handleReadToggle}
             isRead={userStatus === "read"}
           >
-            <CheckCircle />
-            Read
+            {userStatus === "read" ? <VisibilityOff /> : <CheckCircle />}
+            {userStatus === "read" ? "Mark as Unread" : "Mark as Read"}
           </ActionButton>
           <ActionButton
             onClick={() => handleStatusUpdate("wishlist")}

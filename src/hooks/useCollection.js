@@ -45,7 +45,7 @@ const useCollection = () => {
         );
         showToast(`${book.title} removed from collection`, "info");
       } else {
-        // Update status
+        // Update status - preserve original order
         const updatedCollection = collection.map((b) =>
           b.book_id === book.book_id
             ? { ...b, status: statusOrder[nextIndex] }
@@ -62,7 +62,7 @@ const useCollection = () => {
         );
       }
     } else {
-      // Add new book to collection
+      // Add new book to collection - add to the end to preserve existing order
       const newBook = {
         ...book,
         status,
@@ -87,12 +87,20 @@ const useCollection = () => {
 
   const updateBookStatus = (bookId, status) => {
     const book = collection.find((b) => b.book_id === bookId);
+    if (!book) return; // Don't update if book doesn't exist
+
     const updatedCollection = collection.map((b) =>
       b.book_id === bookId ? { ...b, status } : b
     );
     setCollection(updatedCollection);
     localStorage.setItem("userCollection", JSON.stringify(updatedCollection));
-    if (book) {
+
+    // Show appropriate message based on the action
+    if (status === "read") {
+      showToast(`${book.title} marked as read`, "success");
+    } else if (status === "owned" && book.status === "read") {
+      showToast(`${book.title} marked as unread`, "info");
+    } else {
       showToast(`${book.title} moved to ${status}`, "success");
     }
   };
