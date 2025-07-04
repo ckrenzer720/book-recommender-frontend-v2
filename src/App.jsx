@@ -4,9 +4,14 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 
+// Context
+import { AuthProvider } from "./contexts/AuthContext.jsx";
+
 // Components
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import LoginForm from "./components/LoginForm.jsx";
+import RegisterForm from "./components/RegisterForm.jsx";
 import Home from "./pages/Home";
 import MyCollection from "./pages/MyCollection";
 import SearchResults from "./pages/SearchResults";
@@ -37,19 +42,23 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Box sx={{ display: "flex" }}>
-          <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-          <Sidebar />
-          <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/my-collection" element={<MyCollection />} />
-              <Route path="/search" element={<SearchResults />} />
-            </Routes>
+      <AuthProvider>
+        <Router>
+          <Box sx={{ display: "flex" }}>
+            <Navbar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+            <Sidebar />
+            <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
+                <Route path="/my-collection" element={<MyCollection />} />
+                <Route path="/search" element={<SearchResults />} />
+              </Routes>
+            </Box>
           </Box>
-        </Box>
-      </Router>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

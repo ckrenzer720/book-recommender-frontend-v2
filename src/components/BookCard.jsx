@@ -1,195 +1,130 @@
-import React from "react";
-import styled from "styled-components";
 import {
-  Favorite,
-  Bookmark,
-  Visibility,
-  BookmarkBorder,
-  Launch,
-  FavoriteBorder,
-  LibraryBooks,
-  CheckCircle,
-  VisibilityOff,
-} from "@mui/icons-material";
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Box,
+  Rating,
+  Chip,
+  Button,
+  CardActions,
+} from "@mui/material";
+import { Book } from "@mui/icons-material";
 
-// Styled Components
-const CardContainer = styled.div`
-  position: relative;
-  transition: all 0.3s ease;
-  overflow: hidden;
+const BookCard = ({ book, onViewDetails, onAddToCollection }) => {
+  const {
+    id,
+    book_id,
+    title,
+    author,
+    description,
+    cover_image,
+    cover_url,
+    average_rating,
+    total_ratings,
+    genre,
+    publication_year,
+  } = book;
 
-  &:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-      0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
-`;
-
-const CoverContainer = styled.div`
-  position: relative;
-  aspect-ratio: 3/4;
-  overflow: hidden;
-`;
-
-const CoverImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-
-  ${CardContainer}:hover & {
-    transform: scale(1.05);
-  }
-`;
-
-const ActionButtonContainer = styled.div`
-  padding: 0.75rem;
-  padding-top: 0;
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const ActionButton = styled.button.withConfig({
-  shouldForwardProp: (prop) =>
-    !["isWishlist", "isOwned", "isRead"].includes(prop),
-})`
-  background-color: ${(props) => {
-    if (props.isWishlist) return "#e91e63";
-    if (props.isOwned) return "#4caf50";
-    if (props.isRead) return "#2196f3";
-    return "#0077c2";
-  }};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  width: 100%;
-
-  &:hover {
-    background-color: ${(props) => {
-      if (props.isWishlist) return "#c2185b";
-      if (props.isOwned) return "#388e3c";
-      if (props.isRead) return "#1976d2";
-      return "#005fa5";
-    }};
-    transform: scale(1.02);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-`;
-
-const BookCard = ({
-  book,
-  onAddToCollection,
-  onViewDetails,
-  onUpdateStatus,
-  userStatus = null,
-}) => {
-  const { book_id, title, cover_url } = book;
-
-  const handleStatusUpdate = (newStatus) => {
-    if (onUpdateStatus) {
-      onUpdateStatus(book_id, newStatus);
-    } else if (onAddToCollection) {
-      onAddToCollection(book_id);
-    }
-  };
-
-  const handleReadToggle = () => {
-    if (onUpdateStatus) {
-      // If currently read, toggle back to owned. If owned, toggle to read.
-      const newStatus = userStatus === "read" ? "owned" : "read";
-      onUpdateStatus(book_id, newStatus);
-    }
-  };
-
-  const handleOwnedToggle = () => {
-    if (onUpdateStatus) {
-      // If currently owned, toggle to wishlist. If wishlist or read, toggle to owned.
-      const newStatus = userStatus === "owned" ? "wishlist" : "owned";
-      onUpdateStatus(book_id, newStatus);
-    }
-  };
-
-  const handleWishlistToggle = () => {
-    if (onUpdateStatus) {
-      // If currently wishlist, toggle to owned. If owned or read, toggle to wishlist.
-      const newStatus = userStatus === "wishlist" ? "owned" : "wishlist";
-      onUpdateStatus(book_id, newStatus);
-    }
-  };
-
-  const renderActionButtons = () => {
-    if (userStatus) {
-      // Book is in collection - show status action buttons
-      return (
-        <>
-          <ActionButton
-            onClick={handleOwnedToggle}
-            isOwned={userStatus === "owned"}
-          >
-            {userStatus === "owned" ? <BookmarkBorder /> : <LibraryBooks />}
-            {userStatus === "owned" ? "Move to Wishlist" : "Mark as Owned"}
-          </ActionButton>
-          <ActionButton
-            onClick={handleReadToggle}
-            isRead={userStatus === "read"}
-          >
-            {userStatus === "read" ? <VisibilityOff /> : <CheckCircle />}
-            {userStatus === "read" ? "Mark as Unread" : "Mark as Read"}
-          </ActionButton>
-          <ActionButton
-            onClick={handleWishlistToggle}
-            isWishlist={userStatus === "wishlist"}
-          >
-            {userStatus === "wishlist" ? <Favorite /> : <FavoriteBorder />}
-            {userStatus === "wishlist"
-              ? "Remove from Wishlist"
-              : "Add to Wishlist"}
-          </ActionButton>
-        </>
-      );
-    } else {
-      // Book is not in collection - show add to collection button
-      return (
-        <ActionButton
-          onClick={() => handleStatusUpdate("wishlist")}
-          isWishlist={true}
-          style={{ width: "100%" }}
-        >
-          <FavoriteBorder />
-          Add to Collection
-        </ActionButton>
-      );
-    }
-  };
+  // Use book_id if available, otherwise fall back to id
+  const bookId = book_id || id;
 
   return (
-    <div>
-      <CardContainer onClick={() => onViewDetails(book_id)}>
-        <CoverContainer>
-          <CoverImage
-            src={cover_url || "/placeholder-book-cover.jpg"}
-            alt={`${title} cover`}
-            onError={(e) => {
-              e.target.src = "/placeholder-book-cover.jpg";
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        transition: "transform 0.2s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: 4,
+        },
+      }}
+    >
+      <CardMedia
+        component="img"
+        height="200"
+        image={cover_image || cover_url || "/placeholder-book.jpg"}
+        alt={title}
+        sx={{
+          objectFit: "cover",
+          backgroundColor: "grey.200",
+        }}
+      />
+
+      <CardContent
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+      >
+        <Typography gutterBottom variant="h6" component="h2" noWrap>
+          {title}
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          by {author}
+        </Typography>
+
+        {publication_year && (
+          <Typography variant="caption" color="text.secondary" gutterBottom>
+            {publication_year}
+          </Typography>
+        )}
+
+        {description && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              mb: 1,
             }}
-          />
-        </CoverContainer>
-      </CardContainer>
-      <ActionButtonContainer>{renderActionButtons()}</ActionButtonContainer>
-    </div>
+          >
+            {description}
+          </Typography>
+        )}
+
+        <Box sx={{ mt: "auto" }}>
+          {genre && <Chip label={genre} size="small" sx={{ mb: 1 }} />}
+
+          {average_rating > 0 && (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Rating
+                value={average_rating}
+                precision={0.5}
+                size="small"
+                readOnly
+              />
+              <Typography variant="caption" sx={{ ml: 0.5 }}>
+                ({total_ratings || 0})
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </CardContent>
+
+      <CardActions>
+        <Button
+          size="small"
+          onClick={() => onViewDetails && onViewDetails(bookId)}
+          startIcon={<Book />}
+        >
+          View Details
+        </Button>
+        {onAddToCollection && (
+          <Button
+            size="small"
+            onClick={() => onAddToCollection && onAddToCollection(book)}
+            variant="outlined"
+          >
+            Add to Collection
+          </Button>
+        )}
+      </CardActions>
+    </Card>
   );
 };
 
