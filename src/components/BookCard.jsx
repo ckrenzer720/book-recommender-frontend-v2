@@ -32,40 +32,78 @@ const BookCard = ({ book, onViewDetails, onAddToCollection }) => {
   return (
     <Card
       sx={{
-        height: "100%",
+        maxWidth: 220,
+        minHeight: 380,
         display: "flex",
         flexDirection: "column",
-        transition: "transform 0.2s ease-in-out",
+        transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+        borderRadius: 2,
+        overflow: "hidden",
         "&:hover": {
           transform: "translateY(-4px)",
-          boxShadow: 4,
+          boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
         },
       }}
     >
       <CardMedia
         component="img"
-        height="200"
+        height="260"
         image={cover_image || cover_url || "/placeholder-book.jpg"}
         alt={title}
         sx={{
           objectFit: "cover",
           backgroundColor: "grey.200",
+          borderBottom: "1px solid rgba(0,0,0,0.1)",
         }}
       />
 
       <CardContent
-        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          p: 2,
+        }}
       >
-        <Typography gutterBottom variant="h6" component="h2" noWrap>
+        <Typography
+          gutterBottom
+          variant="h6"
+          component="h2"
+          sx={{
+            fontWeight: 600,
+            fontSize: "1.1rem",
+            lineHeight: 1.3,
+            mb: 1,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
           {title}
         </Typography>
 
-        <Typography variant="body2" color="text.secondary" gutterBottom>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            fontWeight: 500,
+            mb: 0.5,
+          }}
+        >
           by {author}
         </Typography>
 
         {publication_year && (
-          <Typography variant="caption" color="text.secondary" gutterBottom>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              mb: 1,
+              fontStyle: "italic",
+            }}
+          >
             {publication_year}
           </Typography>
         )}
@@ -81,14 +119,25 @@ const BookCard = ({ book, onViewDetails, onAddToCollection }) => {
               WebkitLineClamp: 3,
               WebkitBoxOrient: "vertical",
               mb: 1,
+              lineHeight: 1.4,
             }}
           >
             {description}
           </Typography>
         )}
 
-        <Box sx={{ mt: "auto" }}>
-          {genre && <Chip label={genre} size="small" sx={{ mb: 1 }} />}
+        <Box sx={{ mt: "auto", pt: 1 }}>
+          {genre && (
+            <Chip
+              label={genre}
+              size="small"
+              sx={{
+                mb: 1,
+                fontSize: "0.75rem",
+                height: 24,
+              }}
+            />
+          )}
 
           {average_rating > 0 && (
             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
@@ -106,11 +155,12 @@ const BookCard = ({ book, onViewDetails, onAddToCollection }) => {
         </Box>
       </CardContent>
 
-      <CardActions>
+      <CardActions sx={{ p: 2, pt: 0 }}>
         <Button
           size="small"
           onClick={() => onViewDetails && onViewDetails(bookId)}
           startIcon={<Book />}
+          sx={{ fontSize: "0.8rem" }}
         >
           View Details
         </Button>
@@ -119,6 +169,7 @@ const BookCard = ({ book, onViewDetails, onAddToCollection }) => {
             size="small"
             onClick={() => onAddToCollection && onAddToCollection(book)}
             variant="outlined"
+            sx={{ fontSize: "0.8rem" }}
           >
             Add to Collection
           </Button>
